@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TestScenario",
+  "type": "object",
+  "properties": {
+    "scenario_id": { "type": "string" },
+    "target_url": { "type": "string", "format": "uri" },
+    "target_goal": { "type": "string" },
+    "persona": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "age": { "type": "integer" },
+        "tech_savviness": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "attention_span_seconds": { "type": "integer" },
+        "motivation_level": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "cognitive_biases": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["name", "tech_savviness", "attention_span_seconds", "motivation_level"]
+    },
+    "max_steps": { "type": "integer", "default": 10 }
+  },
+  "required": ["scenario_id", "target_url", "target_goal", "persona"]
+}

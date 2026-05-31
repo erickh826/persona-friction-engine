@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "StepEvaluation",
+  "type": "object",
+  "properties": {
+    "step_number": { "type": "integer" },
+    "current_url": { "type": "string", "format": "uri" },
+    "action_taken": { "type": "string" },
+    "visual_complexity_score": { "type": "integer", "minimum": 1, "maximum": 100 },
+    "interaction_friction_score": { "type": "integer", "minimum": 1, "maximum": 100 },
+    "cognitive_alignment_score": { "type": "integer", "minimum": 1, "maximum": 100 },
+    "composite_cls": { "type": "integer", "minimum": 1, "maximum": 100 },
+    "identified_friction_points": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+          "description": { "type": "string" },
+          "recommendation": { "type": "string" }
+        },
+        "required": ["severity", "description", "recommendation"]
+      }
+    },
+    "screenshot_path": { "type": "string" }
+  },
+  "required": ["step_number", "current_url", "composite_cls", "identified_friction_points"]
+}
