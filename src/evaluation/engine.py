@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Protocol
 
+from src.evaluation.llm_client import OpenAIVisionEvaluationClient
 from src.evaluation.models import FrictionPoint, StepEvaluationResult
 
 _CTA_KEYWORDS = (
@@ -16,16 +17,47 @@ _CTA_KEYWORDS = (
 )
 
 
+class VisionEvaluationClient(Protocol):
+    def analyze_step(
+        self,
+        *,
+        screenshot_path: str | None,
+        dom_state: dict[str, Any],
+        persona_constraints: dict[str, Any],
+    ) -> dict[str, Any]:
+        ...
+
+
 class CognitiveEvaluationEngine:
-    def __init__(self, use_llm: bool = False, api_key: str | None = None):
-        if use_llm:
-            raise NotImplementedError("LLM evaluation is not available in M1.")
+    def __init__(
+        self,
+        use_llm: bool = False,
+        api_key: str | None = None,
+        llm_client: VisionEvaluationClient | None = None,
+        llm_model: str = "gpt-4.1-mini",
+    ):
         self.use_llm = use_llm
         self.api_key = api_key
+        self.llm_client = llm_client
+        if self.use_llm and self.llm_client is None:
+            self.llm_client = OpenAIVisionEvaluationClient(
+                api_key=api_key,
+                model=llm_model,
+            )
 
     def evaluate_step(
-        self, dom_state: dict[str, Any], persona_constraints: dict[str, Any]
+        self,
+        dom_state: dict[str, Any],
+        persona_constraints: dict[str, Any],
+        screenshot_path: str | None = None,
     ) -> StepEvaluationResult:
+        if self.use_llm:
+            return self._evaluate_step_with_llm(
+                dom_state=dom_state,
+                persona_constraints=persona_constraints,
+                screenshot_path=screenshot_path,
+            )
+
         elements = dom_state.get("elements", [])
         visual = self._visual_complexity_score(len(elements))
         interaction = self._interaction_friction_score(elements)
@@ -40,6 +72,42 @@ class CognitiveEvaluationEngine:
             cognitive_alignment_score=alignment,
             composite_cls=composite,
             identified_friction_points=friction_points,
+        )
+
+    def _evaluate_step_with_llm(
+        self,
+        *,
+        dom_state: dict[str, Any],
+        persona_constraints: dict[str, Any],
+        screenshot_path: str | None,
+    ) -> StepEvaluationResult:
+        if self.llm_client is None:
+            raise RuntimeError("LLM evaluation requested without an LLM client.")
+
+        payload = self.llm_client.analyze_step(
+            screenshot_path=screenshot_path,
+            dom_state=dom_state,
+            persona_constraints=persona_constraints,
+        )
+        visual = int(payload["visual_complexity_score"])
+        interaction = int(payload["interaction_friction_score"])
+        alignment = int(payload["cognitive_alignment_score"])
+
+        return StepEvaluationResult.model_validate(
+            {
+                **payload,
+                "visual_complexity_score": visual,
+                "interaction_friction_score": interaction,
+                "cognitive_alignment_score": alignment,
+                "composite_cls": self._composite_cls(
+                    visual=visual,
+                    interaction=interaction,
+                    alignment=alignment,
+                ),
+                "identified_friction_points": payload.get(
+                    "identified_friction_points", []
+                ),
+            }
         )
 
     def identify_friction_points(self, dom_state: dict[str, Any]) -> list[FrictionPoint]:
