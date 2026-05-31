@@ -1,0 +1,517 @@
+{
+  "metadata": {
+    "title": "Top 50 E-Commerce Sites — Hong Kong & Taiwan Benchmark",
+    "title_zh": "香港及台灣前 50 大電商網站基準測試清單",
+    "version": "1.0.0",
+    "last_updated": "2026-06-01",
+    "description": "Curated list of top e-commerce and retail websites in Hong Kong and Taiwan for the Persona Friction Engine benchmark audit. Sites are selected based on SimilarWeb traffic rankings, market share data, and local relevance.",
+    "sources": [
+      "SimilarWeb Top E-Commerce Rankings HK/TW",
+      "Statista HK E-Commerce Traffic Share 2025",
+      "BusinessWeekly TW E-Commerce Rankings 2025"
+    ],
+    "regions": ["HK", "TW"],
+    "total_sites": 50
+  },
+  "sites": [
+    {
+      "id": 1,
+      "region": "TW",
+      "name": "蝦皮購物 Shopee Taiwan",
+      "url": "https://shopee.tw",
+      "category": "Marketplace",
+      "monthly_visitors_m": 52,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 2,
+      "region": "TW",
+      "name": "momo 購物網",
+      "url": "https://www.momoshop.com.tw",
+      "category": "Marketplace",
+      "monthly_visitors_m": 29,
+      "benchmark_flow": "homepage_to_product_page"
+    },
+    {
+      "id": 3,
+      "region": "TW",
+      "name": "酷澎 Coupang Taiwan",
+      "url": "https://www.coupang.com/tw",
+      "category": "Marketplace",
+      "monthly_visitors_m": 18,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 4,
+      "region": "TW",
+      "name": "7-ELEVEN ibon mart",
+      "url": "https://www.7-11.com.tw",
+      "category": "Convenience Retail",
+      "monthly_visitors_m": 15,
+      "benchmark_flow": "homepage_to_product_page"
+    },
+    {
+      "id": 5,
+      "region": "TW",
+      "name": "博客來 Books.com.tw",
+      "url": "https://www.books.com.tw",
+      "category": "Books & Media",
+      "monthly_visitors_m": 14,
+      "benchmark_flow": "search_to_product_detail"
+    },
+    {
+      "id": 6,
+      "region": "TW",
+      "name": "PChome 24h購物",
+      "url": "https://24h.pchome.com.tw",
+      "category": "Electronics & General",
+      "monthly_visitors_m": 12,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 7,
+      "region": "TW",
+      "name": "Yahoo 奇摩購物中心",
+      "url": "https://tw.buy.yahoo.com",
+      "category": "Marketplace",
+      "monthly_visitors_m": 10,
+      "benchmark_flow": "homepage_to_product_page"
+    },
+    {
+      "id": 8,
+      "region": "TW",
+      "name": "露天市集",
+      "url": "https://www.ruten.com.tw",
+      "category": "C2C Marketplace",
+      "monthly_visitors_m": 8,
+      "benchmark_flow": "search_to_product_detail"
+    },
+    {
+      "id": 9,
+      "region": "TW",
+      "name": "Pinkoi",
+      "url": "https://www.pinkoi.com",
+      "category": "Design & Lifestyle",
+      "monthly_visitors_m": 6,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 10,
+      "region": "TW",
+      "name": "全聯線上購物 PX Go!",
+      "url": "https://www.pxgo.com.tw",
+      "category": "Grocery & Supermarket",
+      "monthly_visitors_m": 5,
+      "benchmark_flow": "homepage_to_product_page"
+    },
+    {
+      "id": 11,
+      "region": "TW",
+      "name": "UNIQLO Taiwan",
+      "url": "https://www.uniqlo.com/tw",
+      "category": "Fashion & Apparel",
+      "monthly_visitors_m": 4,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 12,
+      "region": "TW",
+      "name": "ZARA Taiwan",
+      "url": "https://www.zara.com/tw",
+      "category": "Fashion & Apparel",
+      "monthly_visitors_m": 3.5,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 13,
+      "region": "TW",
+      "name": "Nike Taiwan",
+      "url": "https://www.nike.com/tw",
+      "category": "Sports & Footwear",
+      "monthly_visitors_m": 3,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 14,
+      "region": "TW",
+      "name": "IKEA Taiwan",
+      "url": "https://www.ikea.com/tw",
+      "category": "Home & Furniture",
+      "monthly_visitors_m": 2.8,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 15,
+      "region": "TW",
+      "name": "家樂福線上購物",
+      "url": "https://online.carrefour.com.tw",
+      "category": "Grocery & Supermarket",
+      "monthly_visitors_m": 2.5,
+      "benchmark_flow": "homepage_to_product_page"
+    },
+    {
+      "id": 16,
+      "region": "TW",
+      "name": "燦坤快3網路旗艦店",
+      "url": "https://www.3c.com.tw",
+      "category": "Electronics",
+      "monthly_visitors_m": 2.2,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 17,
+      "region": "TW",
+      "name": "東森購物",
+      "url": "https://www.etmall.com.tw",
+      "category": "TV Shopping & General",
+      "monthly_visitors_m": 2,
+      "benchmark_flow": "homepage_to_product_page"
+    },
+    {
+      "id": 18,
+      "region": "TW",
+      "name": "friDay購物",
+      "url": "https://shopping.friday.tw",
+      "category": "Marketplace",
+      "monthly_visitors_m": 1.8,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 19,
+      "region": "TW",
+      "name": "誠品線上",
+      "url": "https://www.eslite.com",
+      "category": "Books & Lifestyle",
+      "monthly_visitors_m": 1.5,
+      "benchmark_flow": "search_to_product_detail"
+    },
+    {
+      "id": 20,
+      "region": "TW",
+      "name": "蔦屋書店 TSUTAYA",
+      "url": "https://www.tsutaya.com.tw",
+      "category": "Books & Media",
+      "monthly_visitors_m": 1.2,
+      "benchmark_flow": "homepage_to_product_page"
+    },
+    {
+      "id": 21,
+      "region": "TW",
+      "name": "Apple Taiwan Store",
+      "url": "https://www.apple.com/tw/shop",
+      "category": "Electronics",
+      "monthly_visitors_m": 4,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 22,
+      "region": "TW",
+      "name": "ASUS 華碩 eShop",
+      "url": "https://www.asus.com/tw/store",
+      "category": "Electronics",
+      "monthly_visitors_m": 1.5,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 23,
+      "region": "TW",
+      "name": "大潤發線上購物",
+      "url": "https://www.rt-mart.com.tw/direct",
+      "category": "Grocery & Supermarket",
+      "monthly_visitors_m": 1.2,
+      "benchmark_flow": "homepage_to_product_page"
+    },
+    {
+      "id": 24,
+      "region": "TW",
+      "name": "屈臣氏台灣網路商店",
+      "url": "https://www.watsons.com.tw",
+      "category": "Health & Beauty",
+      "monthly_visitors_m": 1.8,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 25,
+      "region": "TW",
+      "name": "康是美線上購物",
+      "url": "https://www.cosmed.com.tw",
+      "category": "Health & Beauty",
+      "monthly_visitors_m": 1.0,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 26,
+      "region": "HK",
+      "name": "HKTVmall",
+      "url": "https://www.hktvmall.com",
+      "category": "Marketplace",
+      "monthly_visitors_m": 8,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 27,
+      "region": "HK",
+      "name": "Carousell Hong Kong",
+      "url": "https://www.carousell.com.hk",
+      "category": "C2C Marketplace",
+      "monthly_visitors_m": 6,
+      "benchmark_flow": "search_to_product_detail"
+    },
+    {
+      "id": 28,
+      "region": "HK",
+      "name": "Price.com.hk 格價網",
+      "url": "https://www.price.com.hk",
+      "category": "Price Comparison",
+      "monthly_visitors_m": 5,
+      "benchmark_flow": "search_to_product_detail"
+    },
+    {
+      "id": 29,
+      "region": "HK",
+      "name": "UNIQLO Hong Kong",
+      "url": "https://www.uniqlo.com/hk",
+      "category": "Fashion & Apparel",
+      "monthly_visitors_m": 3,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 30,
+      "region": "HK",
+      "name": "ZARA Hong Kong",
+      "url": "https://www.zara.com/hk",
+      "category": "Fashion & Apparel",
+      "monthly_visitors_m": 2.5,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 31,
+      "region": "HK",
+      "name": "Apple Hong Kong Store",
+      "url": "https://www.apple.com/hk/shop",
+      "category": "Electronics",
+      "monthly_visitors_m": 3.5,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 32,
+      "region": "HK",
+      "name": "Watsons Hong Kong",
+      "url": "https://www.watsons.com.hk",
+      "category": "Health & Beauty",
+      "monthly_visitors_m": 2.8,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 33,
+      "region": "HK",
+      "name": "Mannings Online",
+      "url": "https://www.mannings.com.hk",
+      "category": "Health & Beauty",
+      "monthly_visitors_m": 1.5,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 34,
+      "region": "HK",
+      "name": "IKEA Hong Kong",
+      "url": "https://www.ikea.com/hk",
+      "category": "Home & Furniture",
+      "monthly_visitors_m": 2,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 35,
+      "region": "HK",
+      "name": "Nike Hong Kong",
+      "url": "https://www.nike.com/hk",
+      "category": "Sports & Footwear",
+      "monthly_visitors_m": 2.2,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 36,
+      "region": "HK",
+      "name": "Adidas Hong Kong",
+      "url": "https://www.adidas.com.hk",
+      "category": "Sports & Footwear",
+      "monthly_visitors_m": 1.8,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 37,
+      "region": "HK",
+      "name": "Sasa 莎莎網上商店",
+      "url": "https://www.sasa.com",
+      "category": "Health & Beauty",
+      "monthly_visitors_m": 1.5,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 38,
+      "region": "HK",
+      "name": "Fortress 豐澤",
+      "url": "https://www.fortress.com.hk",
+      "category": "Electronics",
+      "monthly_visitors_m": 2,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 39,
+      "region": "HK",
+      "name": "Broadway 百老匯",
+      "url": "https://www.broadway.com.hk",
+      "category": "Electronics",
+      "monthly_visitors_m": 1.8,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 40,
+      "region": "HK",
+      "name": "Log-On 崇光百貨網店",
+      "url": "https://www.log-on.com",
+      "category": "Lifestyle & General",
+      "monthly_visitors_m": 1.2,
+      "benchmark_flow": "homepage_to_product_page"
+    },
+    {
+      "id": 41,
+      "region": "HK",
+      "name": "SOGO 崇光百貨",
+      "url": "https://www.sogo.com.hk",
+      "category": "Department Store",
+      "monthly_visitors_m": 1.0,
+      "benchmark_flow": "homepage_to_product_page"
+    },
+    {
+      "id": 42,
+      "region": "HK",
+      "name": "CitySuper",
+      "url": "https://www.citysuper.com.hk",
+      "category": "Grocery & Premium Food",
+      "monthly_visitors_m": 0.8,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 43,
+      "region": "HK",
+      "name": "PARKnSHOP 百佳超級市場",
+      "url": "https://www.parknshop.com",
+      "category": "Grocery & Supermarket",
+      "monthly_visitors_m": 1.5,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 44,
+      "region": "HK",
+      "name": "Wellcome 惠康超級市場",
+      "url": "https://www.wellcome.com.hk",
+      "category": "Grocery & Supermarket",
+      "monthly_visitors_m": 1.2,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 45,
+      "region": "HK",
+      "name": "H&M Hong Kong",
+      "url": "https://www2.hm.com/en_asia2/hong-kong",
+      "category": "Fashion & Apparel",
+      "monthly_visitors_m": 1.5,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 46,
+      "region": "HK",
+      "name": "Lane Crawford",
+      "url": "https://www.lanecrawford.com",
+      "category": "Luxury Department Store",
+      "monthly_visitors_m": 1.0,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 47,
+      "region": "TW",
+      "name": "H&M Taiwan",
+      "url": "https://www2.hm.com/zh_asia2/taiwan",
+      "category": "Fashion & Apparel",
+      "monthly_visitors_m": 1.5,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 48,
+      "region": "TW",
+      "name": "GQ Mall",
+      "url": "https://www.gqmall.com.tw",
+      "category": "Fashion & Lifestyle",
+      "monthly_visitors_m": 0.8,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 49,
+      "region": "TW",
+      "name": "LATIV",
+      "url": "https://www.lativ.com.tw",
+      "category": "Fashion & Apparel",
+      "monthly_visitors_m": 1.2,
+      "benchmark_flow": "product_search_to_checkout"
+    },
+    {
+      "id": 50,
+      "region": "HK",
+      "name": "Zalora Hong Kong",
+      "url": "https://www.zalora.com.hk",
+      "category": "Fashion & Apparel",
+      "monthly_visitors_m": 1.0,
+      "benchmark_flow": "product_search_to_checkout"
+    }
+  ],
+  "benchmark_flows": {
+    "product_search_to_checkout": {
+      "description": "Search for a product → view product detail → add to cart → begin checkout",
+      "description_zh": "搜尋商品 → 查看商品詳情 → 加入購物車 → 開始結帳",
+      "max_steps": 6
+    },
+    "homepage_to_product_page": {
+      "description": "Land on homepage → navigate to a category → click a product",
+      "description_zh": "進入首頁 → 導航至分類 → 點擊商品",
+      "max_steps": 4
+    },
+    "search_to_product_detail": {
+      "description": "Use site search → filter results → view product detail",
+      "description_zh": "使用站內搜尋 → 篩選結果 → 查看商品詳情",
+      "max_steps": 4
+    }
+  },
+  "personas": [
+    {
+      "id": "busy-mom-hk",
+      "name": "Busy Mom (HK)",
+      "age": 38,
+      "tech_savviness": 2,
+      "attention_span_seconds": 45,
+      "motivation_level": 3,
+      "cognitive_biases": ["loss aversion", "status quo bias"],
+      "region": "HK"
+    },
+    {
+      "id": "tech-millennial-tw",
+      "name": "Tech Millennial (TW)",
+      "age": 28,
+      "tech_savviness": 4,
+      "attention_span_seconds": 90,
+      "motivation_level": 4,
+      "cognitive_biases": ["social proof", "anchoring"],
+      "region": "TW"
+    },
+    {
+      "id": "senior-shopper-hk",
+      "name": "Senior Shopper (HK)",
+      "age": 65,
+      "tech_savviness": 1,
+      "attention_span_seconds": 60,
+      "motivation_level": 2,
+      "cognitive_biases": ["authority bias", "familiarity bias"],
+      "region": "HK"
+    }
+  ]
+}

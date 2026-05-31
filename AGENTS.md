@@ -112,18 +112,21 @@ All M2 modules have been merged to `main`. 42 tests passing.
 
 ### 📋 `feature/m3-benchmark-report` — Cursor
 
-**Goal**: Build a batch runner that audits the top 50 Taiwan e-commerce sites and generates a publishable benchmark report.
+**Goal**: Build a batch runner that audits the top 50 e-commerce sites across **Hong Kong and Taiwan** and generates a bilingual, publishable benchmark report.
 
-**目標**：建立一個批次執行器，對台灣前 50 大電商網站進行審計，並生成可發布的基準測試報告。
+**目標**：建立一個批次執行器，對**香港及台灣**前 50 大電商網站進行審計，並生成可發布的雙語基準測試報告。
 
-- [ ] **Task 4.1**: Create `scripts/benchmark_runner.py` — batch scenario runner with rate limiting and retry
-- [ ] **Task 4.2**: Create `data/top50_taiwan_ecommerce.json` — list of 50 target URLs with metadata
-- [ ] **Task 4.3**: Implement parallel audit execution (asyncio, max 3 concurrent)
-- [ ] **Task 4.4**: Implement `BenchmarkReportGenerator` — aggregates all audit results into a ranked HTML report
-- [ ] **Task 4.5**: Add industry-level CLS distribution charts (histogram, box plot per category)
-- [ ] **Task 4.6**: Add "Hall of Shame" and "Hall of Fame" sections (top 5 worst / best CLS)
-- [ ] **Task 4.7**: Write unit tests for `BenchmarkReportGenerator`
-- [ ] **Task 4.8**: Submit PR
+> **Scope Update**: Coverage expanded from Taiwan-only to **Hong Kong + Taiwan** (25 HK sites + 25 TW sites). Site list is pre-populated in `data/top50_hk_tw_ecommerce.json`. Three standard Personas are defined (Busy Mom HK, Tech Millennial TW, Senior Shopper HK).
+
+- [ ] **Task 4.1**: Create `scripts/benchmark_runner.py` — batch scenario runner with rate limiting, retry, and region-aware persona selection
+- [ ] **Task 4.2**: ~~Create data file~~ ✅ **DONE** — `data/top50_hk_tw_ecommerce.json` already created with 50 sites (25 HK + 25 TW), 3 benchmark flows, and 3 regional personas
+- [ ] **Task 4.3**: Implement parallel audit execution (asyncio, max 3 concurrent, respects per-domain rate limits)
+- [ ] **Task 4.4**: Implement `BenchmarkReportGenerator` — aggregates all audit results into a bilingual ranked HTML report (EN + 繁中)
+- [ ] **Task 4.5**: Add region-split CLS distribution charts (HK vs TW side-by-side comparison, histogram per category)
+- [ ] **Task 4.6**: Add "Hall of Shame" and "Hall of Fame" sections (top 5 worst / best CLS per region)
+- [ ] **Task 4.7**: Add cross-region comparison summary table (avg CLS by category: Fashion, Electronics, Grocery, etc.)
+- [ ] **Task 4.8**: Write unit tests for `BenchmarkReportGenerator` (mock audit results)
+- [ ] **Task 4.9**: Submit PR
 
 ---
 
