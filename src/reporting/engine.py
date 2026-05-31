@@ -264,7 +264,7 @@ class ReportingEngine:
                 "low": "border-blue-400 bg-blue-400/20",
             }[severity]
             overlays.append(
-                f"""<div class="absolute border-2 {color}" style="left:{box['x']}%; top:{box['y']}%; width:{box['width']}%; height:{box['height']}%;" title="{self._text(point.get('description', 'Friction point'))}"></div>"""
+                f"""<div class="absolute border-2 {color}" style="left:{self._format_percent(box['x'])}%; top:{self._format_percent(box['y'])}%; width:{self._format_percent(box['width'])}%; height:{self._format_percent(box['height'])}%;" title="{self._text(point.get('description', 'Friction point'))}"></div>"""
             )
         return "\n            ".join(overlays)
 
@@ -313,7 +313,7 @@ class ReportingEngine:
             return ""
         return (
             '<p class="mt-2 text-xs text-slate-500">'
-            f"Overlay: x={box['x']}%, y={box['y']}%, width={box['width']}%, height={box['height']}%"
+            f"Overlay: x={self._format_percent(box['x'])}%, y={self._format_percent(box['y'])}%, width={self._format_percent(box['width'])}%, height={self._format_percent(box['height'])}%"
             "</p>"
         )
 
@@ -371,3 +371,9 @@ class ReportingEngine:
 
     def _clamp_percent(self, value: float) -> float:
         return round(max(0.0, min(100.0, value)), 2)
+
+    def _format_percent(self, value: float) -> str:
+        rounded = round(value, 2)
+        if rounded.is_integer():
+            return str(int(rounded))
+        return str(rounded)
