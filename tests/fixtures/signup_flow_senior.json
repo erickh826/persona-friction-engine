@@ -1,0 +1,14 @@
+{
+  "scenario_id": "signup-flow-senior-shopper",
+  "target_url": "https://example-shop.com/signup",
+  "target_goal": "Register a new account as a senior user unfamiliar with technology",
+  "persona": {
+    "name": "Senior Shopper (Margaret)",
+    "age": 62,
+    "tech_savviness": 1,
+    "attention_span_seconds": 90,
+    "motivation_level": 5,
+    "cognitive_biases": ["authority bias", "anchoring"]
+  },
+  "max_steps": 8
+}

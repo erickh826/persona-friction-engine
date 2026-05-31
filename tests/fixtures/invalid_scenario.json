@@ -1,0 +1,7 @@
+{
+  "scenario_id": "missing-fields",
+  "target_url": "https://example.com",
+  "persona": {
+    "name": "Incomplete Persona"
+  }
+}
