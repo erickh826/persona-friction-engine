@@ -1,99 +1,161 @@
-# Persona Friction Engine — Multi-Agent Cloud Collaboration Guide
+# 🤖 AGENTS.md — Multi-Agent Collaboration Guide
 
-Welcome, Agent! This repository is designed for fully automated, cloud-based multi-agent development. 
-We operate under a **Schema-First**, **Mock-First**, and **CI-Enforced** workflow.
+This file is the **single source of truth** for all AI agents (Manus, Cursor, Copilot, and others) working on this repository. Read this file before starting any work.
 
 ---
 
-## 🚀 Current Milestone: Milestone 2 (M2) — Audit as a Service & LLM Vision
-**Objective**: Transition from rule-based M1 mock evaluations to dynamic, LLM-powered visual and cognitive UX audits, with a polished HTML reporting interface.
+## 📌 Collaboration Rules (協作規則)
 
-### 👥 M2 Multi-Agent Assignments
+1. **Schema-First**: All module boundaries are defined by `schemas/`. Never change a schema without creating a PR discussion first.
+2. **Branch-Per-Module**: Each agent works on its own `feature/<module-name>` branch. Never commit directly to `main`.
+3. **Mock-First**: Every module must have a working mock before integrating with other modules.
+4. **PR Required**: All changes must go through a Pull Request. PRs must pass CI tests before merging.
+5. **AGENTS.md is canonical**: If AGENTS.md conflicts with any other doc, AGENTS.md wins.
 
-We have divided the M2 scope into four parallel feature branches. Check out your assigned branch and complete your tasks:
+---
 
-| Branch | Assigned Agent | Core Focus |
+## ✅ M1 — COMPLETED (已完成)
+
+All M1 modules have been merged to `main`. 27 tests passing.
+
+| Module | Agent | Status |
 | :--- | :--- | :--- |
-| `feature/m2-persona-llm` | **GitHub Copilot** | LLM-based cognitive state & dynamic intent generation |
-| `feature/m2-vision-eval` | **Cursor** | GPT-4o Vision visual complexity & interaction friction audit |
-| `feature/m2-interactive-report` | **Cursor** | Interactive HTML reporting engine with timeline & CLS charts |
-| `feature/m2-orchestrator-integration` | **Manus** | End-to-end integration, scenario runner CLI, and robust error recovery |
+| Persona Engine | Copilot | ✅ Merged |
+| Navigation Engine | Cursor | ✅ Merged |
+| Evaluation Engine (Rule-based CLS) | Cursor | ✅ Merged |
+| Orchestrator + CLI | Manus | ✅ Merged |
 
 ---
 
-## 📋 Detailed Task Lists per Branch
+## ✅ M2 — COMPLETED (已完成)
 
-### 1. `feature/m2-persona-llm` (Assigned: GitHub Copilot)
-**Goal**: Upgrade `PersonaEngine` to dynamically update the persona's internal cognitive state, motivation, and choose the next action based on current DOM/screenshot.
+All M2 modules have been merged to `main`. 42 tests passing.
 
-- [ ] **Task 1.1: Dynamic State Model**
-  - Extend `src/persona/models.py` to include `PersonaState` (tracks remaining patience, current motivation, confusion level, and execution history).
-- [ ] **Task 1.2: LLM Action Decision**
-  - Implement `PersonaEngine.decide_next_action(profile, state, dom_state, screenshot_path) -> dict` using OpenAI `gpt-4.1-mini` or `gemini-2.5-flash`.
-  - The model must output a structured JSON containing: `action` (`click`/`fill`/`scroll`/`wait`/`dropout`), `selector` (target element), `value` (if filling), and `thought_process` (cognitive justification).
-- [ ] **Task 1.3: Dynamic Prompting**
-  - Inject persona biases (e.g., loss aversion, status quo bias) dynamically into the LLM decision prompt.
-- [ ] **Task 1.4: Unit Tests**
-  - Write tests in `tests/test_persona.py` using mock LLM responses to verify correct state updates and decision parsing.
+| Module | Agent | Status |
+| :--- | :--- | :--- |
+| LLM Persona Engine (dynamic cognitive state) | Copilot | ✅ Merged |
+| Vision Evaluation (GPT-4o screenshot analysis) | Cursor | ✅ Merged |
+| Interactive HTML Report (Tailwind + Chart.js) | Cursor | ✅ Merged |
+| Orchestrator Integration (real engines + error recovery) | Manus | ✅ Merged |
 
 ---
 
-### 2. `feature/m2-vision-eval` (Assigned: Cursor)
-**Goal**: Upgrade `CognitiveEvaluationEngine` to use GPT-4o Vision (`gpt-4.1-mini` or equivalent multimodal model) to analyze page screenshots and evaluate visual complexity and interaction friction.
+## 🚧 M3 — IN PROGRESS (進行中)
 
-- [ ] **Task 2.1: Vision API Integration**
-  - Implement `src/evaluation/engine.py` to support `use_llm=True` in `evaluate_step`.
-  - Send the step screenshot and DOM elements to the LLM.
-- [ ] **Task 2.2: Standardized Evaluation Schema**
-  - Ensure the LLM returns structured JSON matching `schemas/step_evaluation.json`.
-  - Strictly calculate **Cognitive Load Score (CLS)** using our deterministic 3D formula:
-    $$\text{CLS} = 0.35 \times \text{VisualComplexity} + 0.40 \times \text{InteractionFriction} + 0.25 \times (100 - \text{CognitiveAlignment})$$
-- [ ] **Task 2.3: Visual Friction Identification**
-  - Ask the LLM to identify specific visual friction points (e.g., "poor contrast", "cluttered layout", "hidden CTA") with severity, coordinates, and recommendations.
-- [ ] **Task 2.4: Unit Tests**
-  - Write tests in `tests/test_evaluation.py` to verify schema validation and deterministic score calculations.
+**Goal**: Transform the engine into a CI/CD-integrated, self-serve SaaS platform with academic-grade Friction Score credibility.
 
----
+**M3 目標**：將引擎轉化為 CI/CD 整合、自助式 SaaS 平台，並建立具學術公信力的 Friction Score 標準。
 
-### 3. `feature/m2-interactive-report` (Assigned: Cursor)
-**Goal**: Create a beautiful, interactive HTML/CSS dashboard for audit results, including a timeline of user steps, CLS score charts, and detailed friction points.
+### Branch Assignment (分支任務分配)
 
-- [ ] **Task 3.1: Interactive Report Template**
-  - Design a responsive HTML template in `src/reporting/engine.py` using Tailwind CSS (via CDN) and Chart.js (via CDN).
-- [ ] **Task 3.2: Timeline & Chart Visualization**
-  - Render a step-by-step timeline of the simulation.
-  - Render a line chart showing CLS progression over steps, highlighting the dropout point if applicable.
-- [ ] **Task 3.3: Friction Points Inspector**
-  - Display a detailed list of identified friction points, color-coded by severity (Critical, High, Medium, Low), with recommendations.
-  - If coordinates are available, overlay them on the step screenshot.
-- [ ] **Task 3.4: Unit Tests**
-  - Write tests to verify HTML file generation and ensure no external network dependencies are required for the template compilation.
+| Branch | Agent | Module |
+| :--- | :--- | :--- |
+| `feature/m3-github-action` | **Manus** | CI/CD GitHub Action Plugin |
+| `feature/m3-dynamic-persona` | **Copilot** | GA-Integrated Dynamic Persona Engine |
+| `feature/m3-saas-api` | **Cursor** | Self-Serve REST API + Auth Layer |
+| `feature/m3-benchmark-report` | **Cursor** | 50 Top E-Commerce Benchmark Report Generator |
 
 ---
 
-### 4. `feature/m2-orchestrator-integration` (Assigned: Manus)
-**Goal**: Connect all M2 modules together, handle screenshots properly in the main loop, implement robust error recovery, and update the CLI runner.
+### 📋 `feature/m3-github-action` — Manus
 
-- [ ] **Task 4.1: Real Engine Integration**
-  - Replace the M1 mock engines in `src/main.py` with real instances of `PersonaEngine`, `NavigationEngine`, `CognitiveEvaluationEngine`, and `ReportingEngine`.
-- [ ] **Task 4.2: Main Loop Orchestration**
-  - Ensure `Orchestrator.run_scenario` coordinates screenshot taking: `NavigationEngine` takes screenshot → `CognitiveEvaluationEngine` evaluates screenshot → `PersonaEngine` decides next action based on screenshot + evaluation.
-- [ ] **Task 4.3: Error Recovery & Graceful Exit**
-  - If Playwright fails or LLM rate limits are hit, gracefully save the partial trace and generate a partial report rather than crashing.
-- [ ] **Task 4.4: End-to-End Integration Tests**
-  - Create integration tests in `tests/test_integration.py` running a mock local server to test the entire pipeline.
+**Goal**: Build a GitHub Action that runs a friction audit on every PR, blocking merges if CLS exceeds a configurable threshold.
+
+**目標**：建立一個 GitHub Action，在每個 PR 上執行摩擦力審計，當 CLS 超過可配置閾值時阻止合併。
+
+- [ ] **Task 1.1**: Create `action.yml` with inputs: `scenario_path`, `target_url`, `cls_threshold`, `fail_on_exceed`
+- [ ] **Task 1.2**: Create `entrypoint.sh` Docker-based action runner
+- [ ] **Task 1.3**: Implement `src/ci/github_action_runner.py` — wraps Orchestrator for CI context
+- [ ] **Task 1.4**: Output structured JSON result as GitHub Action output variables
+- [ ] **Task 1.5**: Post a formatted PR comment with CLS score, friction points table, and screenshot thumbnails
+- [ ] **Task 1.6**: Create `Dockerfile` for the action container (Python 3.11 + Playwright)
+- [ ] **Task 1.7**: Write unit tests for the CI runner (mock GitHub API calls)
+- [ ] **Task 1.8**: Create example workflow YAML in `examples/github-action-example.yml`
+- [ ] **Task 1.9**: Submit PR
 
 ---
 
-## 🛠️ Developer Agent Collaboration Rules
+### 📋 `feature/m3-dynamic-persona` — Copilot
 
-1. **Schema-First**: All interface boundaries are defined by JSON Schemas in `schemas/`. Any changes to these schemas must be done via a separate PR to `main` before implementing the code.
-2. **Mock-First**: When implementing your module, mock your dependencies. Do not wait for other agents to finish their branches.
-3. **CI Enforced**: Every branch must pass all unit tests on every push. GitHub Actions will run `pytest` on all PRs.
-4. **Pull Requests**:
-   - Work on your assigned `feature/` branch.
-   - When done, open a PR into `main`.
-   - Ensure the PR title starts with `feat(...)` or `fix(...)`.
-   - Wait for CI checks to pass before requesting a merge.
+**Goal**: Integrate Google Analytics export data to dynamically generate Persona profiles based on real user demographics.
 
-Let's build the ultimate Persona Friction Engine! 🚀
+**目標**：整合 Google Analytics 匯出資料，根據真實用戶人口統計數據動態生成 Persona 畫像。
+
+- [ ] **Task 2.1**: Define `GAPersonaConfig` Pydantic model (GA property ID, date range, segment filters)
+- [ ] **Task 2.2**: Implement `GAPersonaGenerator` — reads GA4 export CSV/JSON and maps demographics to `PersonaProfile`
+- [ ] **Task 2.3**: Implement persona clustering logic (group GA users into 3–5 representative archetypes)
+- [ ] **Task 2.4**: Add `--from-ga` CLI flag to `src/main.py` to auto-generate personas from GA data
+- [ ] **Task 2.5**: Create 3 sample GA export fixtures for testing (mock CSV files)
+- [ ] **Task 2.6**: Write unit tests for `GAPersonaGenerator` (deterministic clustering)
+- [ ] **Task 2.7**: Submit PR
+
+---
+
+### 📋 `feature/m3-saas-api` — Cursor
+
+**Goal**: Build a FastAPI REST API layer with API key authentication, enabling self-serve access to the engine.
+
+**目標**：建立一個帶有 API 金鑰認證的 FastAPI REST API 層，實現對引擎的自助式存取。
+
+- [ ] **Task 3.1**: Create `src/api/app.py` — FastAPI application with CORS and error handlers
+- [ ] **Task 3.2**: Implement `POST /v1/audits` endpoint — accepts scenario JSON, returns job ID
+- [ ] **Task 3.3**: Implement `GET /v1/audits/{job_id}` endpoint — returns audit status and result
+- [ ] **Task 3.4**: Implement `GET /v1/audits/{job_id}/report` endpoint — returns HTML report
+- [ ] **Task 3.5**: Implement API key auth middleware (`X-API-Key` header)
+- [ ] **Task 3.6**: Add background task queue (using `asyncio` or `BackgroundTasks`) for async audit runs
+- [ ] **Task 3.7**: Create `src/api/models.py` — Pydantic request/response models
+- [ ] **Task 3.8**: Write API integration tests using `httpx.AsyncClient`
+- [ ] **Task 3.9**: Create `docs/API_V1.md` — OpenAPI-style endpoint documentation
+- [ ] **Task 3.10**: Submit PR
+
+---
+
+### 📋 `feature/m3-benchmark-report` — Cursor
+
+**Goal**: Build a batch runner that audits the top 50 Taiwan e-commerce sites and generates a publishable benchmark report.
+
+**目標**：建立一個批次執行器，對台灣前 50 大電商網站進行審計，並生成可發布的基準測試報告。
+
+- [ ] **Task 4.1**: Create `scripts/benchmark_runner.py` — batch scenario runner with rate limiting and retry
+- [ ] **Task 4.2**: Create `data/top50_taiwan_ecommerce.json` — list of 50 target URLs with metadata
+- [ ] **Task 4.3**: Implement parallel audit execution (asyncio, max 3 concurrent)
+- [ ] **Task 4.4**: Implement `BenchmarkReportGenerator` — aggregates all audit results into a ranked HTML report
+- [ ] **Task 4.5**: Add industry-level CLS distribution charts (histogram, box plot per category)
+- [ ] **Task 4.6**: Add "Hall of Shame" and "Hall of Fame" sections (top 5 worst / best CLS)
+- [ ] **Task 4.7**: Write unit tests for `BenchmarkReportGenerator`
+- [ ] **Task 4.8**: Submit PR
+
+---
+
+## 🔗 Module Interface Contracts
+
+All agents MUST respect these interfaces. Do not change them without a PR discussion.
+
+### PersonaEngine Interface
+```python
+class PersonaEngine:
+    def get_system_prompt(self, profile: PersonaProfile) -> str: ...
+    def get_cognitive_constraints(self, profile: PersonaProfile) -> dict: ...
+    def decide_next_action(self, state: NavigationState, constraints: dict) -> dict: ...  # M2+
+    def generate_from_ga(self, ga_config: GAPersonaConfig) -> list[PersonaProfile]: ...   # M3
+```
+
+### NavigationEngine Interface
+```python
+class NavigationEngine:
+    def navigate_to(self, url: str) -> NavigationState: ...
+    def perform_action(self, action: str, selector: str, value: str | None) -> NavigationState: ...
+    def close(self) -> None: ...
+```
+
+### EvaluationEngine Interface
+```python
+class CognitiveEvaluationEngine:
+    def evaluate_step(self, dom_state: NavigationState, persona_constraints: dict) -> StepEvaluationResult: ...
+```
+
+### ReportingEngine Interface
+```python
+class ReportingEngine:
+    def generate(self, trace: dict, output_dir: str) -> str: ...  # returns report file path
+```
