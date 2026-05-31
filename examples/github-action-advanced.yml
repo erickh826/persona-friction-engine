@@ -1,0 +1,90 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Persona Friction Audit — Advanced Example (Multi-Persona + LLM Vision)
+# 進階用法範例（多 Persona + LLM 視覺評估）
+#
+# Runs THREE parallel audits with different personas on every PR.
+# Uses a custom scenario file and GPT-4o Vision for evaluation.
+# 在每個 PR 上並行執行三個不同 Persona 的審計，使用自定義場景和 GPT-4o Vision。
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: UX Friction Audit (Multi-Persona)
+
+on:
+  pull_request:
+    branches: [main, master]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  audit-busy-mom:
+    name: Audit — Busy Mom Persona
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Friction Audit (Busy Mom)
+        uses: erickh826/persona-friction-engine@main
+        with:
+          scenario_path: '.friction/checkout-flow.json'   # ← Your scenario file
+          cls_threshold: '65'
+          fail_on_exceed: 'true'
+          use_llm: 'true'
+          post_pr_comment: 'true'
+          output_dir: 'audit-busy-mom'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audit-busy-mom
+          path: audit-busy-mom/
+
+  audit-senior:
+    name: Audit — Senior Shopper Persona
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Friction Audit (Senior Shopper)
+        uses: erickh826/persona-friction-engine@main
+        with:
+          scenario_path: '.friction/checkout-flow.json'
+          cls_threshold: '55'                            # Stricter for seniors
+          fail_on_exceed: 'false'                        # Warn only
+          persona_preset: 'senior-shopper'
+          use_llm: 'true'
+          post_pr_comment: 'false'                       # Only one comment per PR
+          output_dir: 'audit-senior'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audit-senior
+          path: audit-senior/
+
+  audit-tech-millennial:
+    name: Audit — Tech Millennial Persona
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Friction Audit (Tech Millennial)
+        uses: erickh826/persona-friction-engine@main
+        with:
+          scenario_path: '.friction/checkout-flow.json'
+          cls_threshold: '75'                            # More lenient for tech users
+          fail_on_exceed: 'false'
+          persona_preset: 'tech-millennial'
+          post_pr_comment: 'false'
+          output_dir: 'audit-tech'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audit-tech-millennial
+          path: audit-tech/
