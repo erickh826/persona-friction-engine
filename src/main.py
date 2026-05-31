@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 """
-Persona Friction Engine — CLI Entrypoint
+Persona Friction Engine — CLI Entrypoint (M2)
 
 Usage:
     python src/main.py --scenario <path_to_scenario.json>
-    python src/main.py --scenario tests/fixtures/sample_scenario.json --output output/
+    python src/main.py --scenario tests/fixtures/sample_scenario.json --output output/ --use-llm
+    python src/main.py --scenario tests/fixtures/sample_scenario.json --headless --no-report
 
 This script loads a scenario, runs the full simulation loop using
-available engine implementations (or mocks), and outputs a summary
-table of step-by-step CLS scores to stdout.
+real engine implementations, and outputs a summary table of step-by-step
+CLS scores to stdout. Generates an HTML report by default.
 """
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -21,204 +23,210 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_PROJECT_ROOT))
 
 from src.orchestrator import Orchestrator, ScenarioLoader, ScenarioValidationError
+from src.persona.engine import PersonaEngine
+from src.persona.models import PersonaProfile
+from src.navigation.engine import NavigationEngine
+from src.evaluation.engine import CognitiveEvaluationEngine
 
 
-# ─── Mock Engines (for M1 standalone usage) ────────────────────────────────────
-# These mocks allow the CLI to run without the other modules being implemented.
-# They will be replaced by real implementations as other agents complete their work.
+# ─── Reporting Engine (Inline M2 Implementation) ──────────────────────────────
+# This will be replaced by the dedicated ReportingEngine from Cursor's branch
+# once feature/m2-interactive-report is merged.
 
 
-class MockPersonaEngine:
-    """Mock Persona Engine for M1 standalone testing."""
-
-    def get_system_prompt(self, profile: dict) -> str:
-        name = profile.get("name", "User")
-        tech = profile.get("tech_savviness", 3)
-        return (
-            f"You are {name}, a user with tech savviness level {tech}/5. "
-            f"You have limited patience and will abandon tasks that feel confusing."
-        )
-
-    def get_cognitive_constraints(self, profile: dict) -> dict:
-        attention = profile.get("attention_span_seconds", 60)
-        tech = profile.get("tech_savviness", 3)
-        motivation = profile.get("motivation_level", 3)
-        return {
-            "max_steps": max(1, attention // 30),
-            "complexity_tolerance": tech,
-            "dropout_threshold": 50 + (motivation * 10),  # 60-100 range
-        }
-
-
-class MockNavigationEngine:
-    """Mock Navigation Engine for M1 standalone testing."""
-
-    def __init__(self):
-        self._step = 0
-        self._mock_elements = [
-            {"tag": "h1", "text": "Welcome to Shop", "selector": "h1", "aria_label": ""},
-            {"tag": "input", "text": "", "selector": "input[name='email']", "aria_label": "Email", "value": ""},
-            {"tag": "input", "text": "", "selector": "input[name='password']", "aria_label": "Password", "value": ""},
-            {"tag": "button", "text": "Continue", "selector": "button.cta", "aria_label": "Continue to checkout"},
-            {"tag": "a", "text": "Terms of Service", "selector": "a.tos", "aria_label": "", "href": "/tos"},
-            {"tag": "img", "text": "", "selector": "img.hero", "aria_label": "Hero banner"},
-            {"tag": "p", "text": "Enter your details to proceed with checkout.", "selector": "p.desc", "aria_label": ""},
-        ]
-
-    def navigate_to(self, url: str) -> dict:
-        self._step = 0
-        return {
-            "current_url": url,
-            "page_title": "Mock E-Commerce Page",
-            "dom_tree_json": json.dumps({"elements": self._mock_elements, "page_title": "Mock Page"}),
-            "screenshot_path": "screenshots/mock_step_0.png",
-            "elements": self._mock_elements,
-            "last_action": "navigate",
-        }
-
-    def perform_action(self, action: str, selector: str, value: str = None) -> dict:
-        self._step += 1
-        # Simulate page transition after CTA click
-        new_elements = [
-            {"tag": "h2", "text": "Order Summary", "selector": "h2", "aria_label": ""},
-            {"tag": "div", "text": "Total: $49.99", "selector": "div.total", "aria_label": "Order total"},
-            {"tag": "button", "text": "Confirm Purchase", "selector": "button.confirm", "aria_label": "Confirm"},
-            {"tag": "a", "text": "Back to cart", "selector": "a.back", "aria_label": "Go back"},
-        ]
-        return {
-            "current_url": f"https://mock-shop.example.com/step/{self._step}",
-            "page_title": f"Step {self._step}",
-            "dom_tree_json": json.dumps({"elements": new_elements, "page_title": f"Step {self._step}"}),
-            "screenshot_path": f"screenshots/mock_step_{self._step}.png",
-            "elements": new_elements,
-            "last_action": f"{action}:{selector}",
-        }
-
-    def close(self):
-        pass
-
-
-class MockEvaluationEngine:
-    """Mock Evaluation Engine for M1 standalone testing."""
-
-    def __init__(self):
-        self._call_count = 0
-
-    def evaluate_step(self, dom_state: dict, persona_constraints: dict) -> dict:
-        self._call_count += 1
-        elements = dom_state.get("elements", [])
-        num_elements = len(elements)
-
-        # Rule-based scoring
-        if num_elements > 50:
-            visual = 85
-        elif num_elements > 20:
-            visual = 55
-        else:
-            visual = 25 + num_elements * 2
-
-        # Check for missing labels
-        unlabeled = sum(
-            1 for e in elements
-            if e.get("tag") in ("button", "input", "a")
-            and not e.get("aria_label")
-            and not e.get("text")
-        )
-        interaction = min(100, 30 + unlabeled * 20)
-
-        # Cognitive alignment
-        tolerance = persona_constraints.get("complexity_tolerance", 3)
-        alignment = max(10, 100 - (visual - tolerance * 15))
-
-        # Composite CLS
-        composite = round(0.35 * visual + 0.40 * interaction + 0.25 * (100 - alignment))
-
-        # Friction points
-        friction_points = []
-        if unlabeled > 0:
-            friction_points.append({
-                "severity": "medium",
-                "description": f"{unlabeled} interactive element(s) missing accessible labels.",
-                "recommendation": "Add aria-label or visible text to all interactive elements.",
-            })
-        if num_elements > 30:
-            friction_points.append({
-                "severity": "low",
-                "description": "Page has high element density which may overwhelm low-tech users.",
-                "recommendation": "Consider progressive disclosure or simplifying the layout.",
-            })
-
-        return {
-            "visual_complexity_score": visual,
-            "interaction_friction_score": interaction,
-            "cognitive_alignment_score": alignment,
-            "composite_cls": composite,
-            "identified_friction_points": friction_points,
-        }
-
-
-class MockReportingEngine:
-    """Mock Reporting Engine for M1 — generates a minimal HTML report."""
+class ReportingEngine:
+    """
+    M2 Reporting Engine — Generates an interactive HTML report with
+    Tailwind CSS and Chart.js for CLS visualization.
+    """
 
     def generate_html_report(self, run_result: dict, output_path: str) -> str:
-        steps_html = ""
-        for step in run_result.get("steps", []):
-            friction_list = "".join(
-                f"<li><strong>[{fp['severity']}]</strong> {fp['description']}</li>"
-                for fp in step.get("identified_friction_points", [])
-            )
-            steps_html += f"""
-            <tr>
-                <td>{step['step_number']}</td>
-                <td>{step['current_url']}</td>
-                <td>{step['composite_cls']}</td>
-                <td>{step['visual_complexity_score']}</td>
-                <td>{step['interaction_friction_score']}</td>
-                <td>{step['cognitive_alignment_score']}</td>
-                <td><ul>{friction_list}</ul></td>
-            </tr>"""
+        """Generate an interactive HTML report from the simulation results."""
+        steps = run_result.get("steps", [])
+
+        # Prepare chart data
+        step_numbers = [s["step_number"] for s in steps]
+        cls_scores = [s["composite_cls"] for s in steps]
+        visual_scores = [s["visual_complexity_score"] for s in steps]
+        friction_scores = [s["interaction_friction_score"] for s in steps]
+        alignment_scores = [s["cognitive_alignment_score"] for s in steps]
+
+        # Prepare friction points HTML
+        friction_html = ""
+        for step in steps:
+            for fp in step.get("identified_friction_points", []):
+                severity = fp.get("severity", "low")
+                color_map = {
+                    "critical": "bg-red-100 border-red-500 text-red-700",
+                    "high": "bg-orange-100 border-orange-500 text-orange-700",
+                    "medium": "bg-yellow-100 border-yellow-500 text-yellow-700",
+                    "low": "bg-blue-100 border-blue-500 text-blue-700",
+                }
+                color = color_map.get(severity, color_map["low"])
+                friction_html += f"""
+                <div class="border-l-4 p-4 mb-3 rounded {color}">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold uppercase text-xs">{severity}</span>
+                        <span class="text-xs text-gray-500">Step {step['step_number']}</span>
+                    </div>
+                    <p class="mt-1 text-sm">{fp.get('description', '')}</p>
+                    <p class="mt-1 text-xs italic">Recommendation: {fp.get('recommendation', '')}</p>
+                </div>"""
+
+        # Steps timeline HTML
+        timeline_html = ""
+        for step in steps:
+            timeline_html += f"""
+            <div class="flex items-start mb-4">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold text-sm">
+                    {step['step_number']}
+                </div>
+                <div class="ml-4 flex-1">
+                    <p class="text-sm font-medium text-gray-800">{step.get('action_taken', 'navigate')}</p>
+                    <p class="text-xs text-gray-500 truncate">{step.get('current_url', '')}</p>
+                    <div class="mt-1 flex gap-3 text-xs">
+                        <span class="px-2 py-0.5 bg-purple-100 rounded">CLS: {step['composite_cls']}</span>
+                        <span class="px-2 py-0.5 bg-blue-100 rounded">Visual: {step['visual_complexity_score']}</span>
+                        <span class="px-2 py-0.5 bg-orange-100 rounded">Friction: {step['interaction_friction_score']}</span>
+                        <span class="px-2 py-0.5 bg-green-100 rounded">Align: {step['cognitive_alignment_score']}</span>
+                    </div>
+                </div>
+            </div>"""
+
+        dropout_badge = ""
+        if run_result.get("dropout"):
+            dropout_badge = f"""
+            <div class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p class="text-red-700 font-bold">Persona Dropped Out</p>
+                <p class="text-red-600 text-sm">{run_result.get('dropout_reason', '')}</p>
+            </div>"""
 
         html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Friction Report: {run_result['scenario_id']}</title>
-    <style>
-        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 2rem; }}
-        h1 {{ color: #1a1a2e; }}
-        table {{ border-collapse: collapse; width: 100%; margin-top: 1rem; }}
-        th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
-        th {{ background-color: #16213e; color: white; }}
-        .summary {{ background: #f0f4f8; padding: 1rem; border-radius: 8px; margin: 1rem 0; }}
-        .dropout {{ color: #e74c3c; font-weight: bold; }}
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UX Friction Report: {run_result['scenario_id']}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-    <h1>UX Friction Report</h1>
-    <div class="summary">
-        <p><strong>Scenario:</strong> {run_result['scenario_id']}</p>
-        <p><strong>Target URL:</strong> {run_result['target_url']}</p>
-        <p><strong>Persona:</strong> {run_result['persona_name']}</p>
-        <p><strong>Final CLS:</strong> {run_result['final_cls']}</p>
-        <p><strong>Total Steps:</strong> {run_result['total_steps']}</p>
-        <p class="{'dropout' if run_result['dropout'] else ''}">
-            <strong>Dropout:</strong> {'Yes — ' + run_result['dropout_reason'] if run_result['dropout'] else 'No'}
-        </p>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-6xl mx-auto px-6 py-10">
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">UX Friction Audit Report</h1>
+            <p class="text-gray-500 mt-2">Generated by Persona Friction Engine</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-xs text-gray-500 uppercase">Scenario</p>
+                    <p class="text-sm font-bold text-gray-800 mt-1">{run_result['scenario_id']}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-xs text-gray-500 uppercase">Persona</p>
+                    <p class="text-sm font-bold text-gray-800 mt-1">{run_result['persona_name']}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-xs text-gray-500 uppercase">Final CLS</p>
+                    <p class="text-2xl font-bold text-indigo-600 mt-1">{run_result['final_cls']}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-xs text-gray-500 uppercase">Steps</p>
+                    <p class="text-2xl font-bold text-gray-800 mt-1">{run_result['total_steps']}</p>
+                </div>
+            </div>
+            {dropout_badge}
+        </div>
+
+        <!-- CLS Chart -->
+        <div class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Cognitive Load Score Progression</h2>
+            <canvas id="clsChart" height="100"></canvas>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Timeline -->
+            <div class="bg-white rounded-xl shadow-sm p-8">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Step Timeline</h2>
+                {timeline_html}
+            </div>
+
+            <!-- Friction Points -->
+            <div class="bg-white rounded-xl shadow-sm p-8">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Identified Friction Points</h2>
+                {friction_html if friction_html else '<p class="text-gray-400 text-sm">No friction points identified.</p>'}
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-xs text-gray-400">
+            <p>Target: {run_result['target_url']} | Duration: {run_result['execution_time_seconds']}s | {run_result['timestamp']}</p>
+        </div>
     </div>
-    <table>
-        <thead>
-            <tr>
-                <th>Step</th>
-                <th>URL</th>
-                <th>CLS</th>
-                <th>Visual</th>
-                <th>Friction</th>
-                <th>Alignment</th>
-                <th>Issues</th>
-            </tr>
-        </thead>
-        <tbody>{steps_html}</tbody>
-    </table>
+
+    <script>
+        const ctx = document.getElementById('clsChart').getContext('2d');
+        new Chart(ctx, {{
+            type: 'line',
+            data: {{
+                labels: {json.dumps(step_numbers)},
+                datasets: [
+                    {{
+                        label: 'Composite CLS',
+                        data: {json.dumps(cls_scores)},
+                        borderColor: 'rgb(79, 70, 229)',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                    }},
+                    {{
+                        label: 'Visual Complexity',
+                        data: {json.dumps(visual_scores)},
+                        borderColor: 'rgb(147, 51, 234)',
+                        borderWidth: 1.5,
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.3,
+                    }},
+                    {{
+                        label: 'Interaction Friction',
+                        data: {json.dumps(friction_scores)},
+                        borderColor: 'rgb(234, 88, 12)',
+                        borderWidth: 1.5,
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.3,
+                    }},
+                    {{
+                        label: 'Cognitive Alignment',
+                        data: {json.dumps(alignment_scores)},
+                        borderColor: 'rgb(22, 163, 74)',
+                        borderWidth: 1.5,
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.3,
+                    }},
+                ],
+            }},
+            options: {{
+                responsive: true,
+                scales: {{
+                    y: {{
+                        beginAtZero: true,
+                        max: 100,
+                        title: {{ display: true, text: 'Score (0-100)' }},
+                    }},
+                    x: {{
+                        title: {{ display: true, text: 'Step' }},
+                    }},
+                }},
+                plugins: {{
+                    legend: {{ position: 'bottom' }},
+                }},
+            }},
+        }});
+    </script>
 </body>
 </html>"""
 
@@ -234,7 +242,7 @@ class MockReportingEngine:
 def print_summary_table(result: dict) -> None:
     """Print a formatted summary table of the simulation results."""
     print("\n" + "=" * 80)
-    print(f"  PERSONA FRICTION ENGINE — Simulation Report")
+    print(f"  PERSONA FRICTION ENGINE — Simulation Report (M2)")
     print("=" * 80)
     print(f"  Scenario:   {result['scenario_id']}")
     print(f"  Target:     {result['target_url']}")
@@ -268,13 +276,13 @@ def print_summary_table(result: dict) -> None:
         print("-" * 80)
         for step_num, fp in all_friction:
             print(f"  [Step {step_num}] [{fp['severity'].upper()}] {fp['description']}")
-            print(f"           → {fp['recommendation']}")
+            print(f"           -> {fp['recommendation']}")
         print("")
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Persona Friction Engine — Run UX friction simulation scenarios.",
+        description="Persona Friction Engine — Run UX friction simulation scenarios (M2).",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
@@ -292,14 +300,35 @@ def main():
         action="store_true",
         help="Skip HTML report generation.",
     )
+    parser.add_argument(
+        "--use-llm",
+        action="store_true",
+        help="Enable LLM-based evaluation (requires OPENAI_API_KEY env var).",
+    )
+    parser.add_argument(
+        "--headless",
+        action="store_true",
+        default=True,
+        help="Run browser in headless mode (default: True).",
+    )
+    parser.add_argument(
+        "--no-headless",
+        action="store_true",
+        help="Run browser in visible mode (for debugging).",
+    )
 
     args = parser.parse_args()
 
-    # Initialize mock engines (will be replaced by real implementations)
-    persona_eng = MockPersonaEngine()
-    nav_eng = MockNavigationEngine()
-    eval_eng = MockEvaluationEngine()
-    report_eng = None if args.no_report else MockReportingEngine()
+    headless = not args.no_headless
+
+    # Initialize REAL engines
+    persona_eng = PersonaEngine()
+    nav_eng = NavigationEngine(headless=headless, screenshots_dir=f"{args.output}/screenshots")
+    eval_eng = CognitiveEvaluationEngine(
+        use_llm=args.use_llm,
+        api_key=os.environ.get("OPENAI_API_KEY") if args.use_llm else None,
+    )
+    report_eng = None if args.no_report else ReportingEngine()
 
     # Create orchestrator
     orchestrator = Orchestrator(
@@ -319,6 +348,9 @@ def main():
     except ScenarioValidationError as e:
         print(f"VALIDATION ERROR: {e}", file=sys.stderr)
         sys.exit(1)
+    except KeyboardInterrupt:
+        print("\nInterrupted by user.", file=sys.stderr)
+        sys.exit(130)
 
     # Print summary
     print_summary_table(result)
