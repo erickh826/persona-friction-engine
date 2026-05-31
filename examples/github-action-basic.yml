@@ -1,0 +1,49 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Persona Friction Audit — Basic Example
+# 基本用法範例
+#
+# Runs a UX friction audit on every PR targeting main.
+# 在每個針對 main 的 PR 上執行 UX 摩擦力審計。
+#
+# Usage: Copy this file to .github/workflows/friction-audit.yml in your repo.
+# 用法：將此文件複製到你的 repo 的 .github/workflows/friction-audit.yml。
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: UX Friction Audit
+
+on:
+  pull_request:
+    branches: [main, master]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write   # Required to post PR comments
+  contents: read
+
+jobs:
+  friction-audit:
+    name: Run Persona Friction Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Friction Audit
+        uses: erickh826/persona-friction-engine@main
+        with:
+          target_url: 'https://your-staging-url.com'   # ← Change this
+          cls_threshold: '65'                           # Fail if CLS > 65
+          fail_on_exceed: 'true'
+          persona_preset: 'busy-mom'
+          post_pr_comment: 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload audit artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: friction-audit-report
+          path: friction-audit-output/
+          retention-days: 30

@@ -1,0 +1,14 @@
+{
+  "scenario_id": "checkout-flow-busy-mom",
+  "target_url": "https://your-site.com/checkout",
+  "target_goal": "Complete a product purchase from cart to order confirmation",
+  "max_steps": 6,
+  "persona": {
+    "name": "Busy Mom",
+    "age": 38,
+    "tech_savviness": 2,
+    "attention_span_seconds": 45,
+    "motivation_level": 3,
+    "cognitive_biases": ["loss aversion", "status quo bias"]
+  }
+}

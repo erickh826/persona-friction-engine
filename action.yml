@@ -1,0 +1,83 @@
+name: 'Persona Friction Audit'
+description: 'Run a UX friction audit on your web app using Persona Friction Engine. Calculates Cognitive Load Score (CLS) and posts a detailed report as a PR comment.'
+author: 'Persona Friction Engine'
+
+branding:
+  icon: 'eye'
+  color: 'purple'
+
+inputs:
+  scenario_path:
+    description: 'Path to the scenario JSON file (relative to repo root). If not provided, target_url must be set.'
+    required: false
+    default: ''
+
+  target_url:
+    description: 'URL to audit. Used when scenario_path is not provided. A default scenario will be generated.'
+    required: false
+    default: ''
+
+  cls_threshold:
+    description: 'Maximum allowed Cognitive Load Score (0–100). The action fails if any step exceeds this value.'
+    required: false
+    default: '70'
+
+  fail_on_exceed:
+    description: 'Set to "true" to fail the workflow (exit code 1) when CLS exceeds cls_threshold. Set to "false" to warn only.'
+    required: false
+    default: 'true'
+
+  persona_preset:
+    description: 'Persona preset to use when no scenario_path is given. Options: busy-mom, tech-millennial, senior-shopper'
+    required: false
+    default: 'busy-mom'
+
+  max_steps:
+    description: 'Maximum number of interaction steps per simulation.'
+    required: false
+    default: '5'
+
+  use_llm:
+    description: 'Set to "true" to enable LLM Vision evaluation (requires OPENAI_API_KEY secret).'
+    required: false
+    default: 'false'
+
+  post_pr_comment:
+    description: 'Set to "true" to post audit results as a PR comment (requires GITHUB_TOKEN).'
+    required: false
+    default: 'true'
+
+  output_dir:
+    description: 'Directory to save audit output (trace JSON, screenshots, HTML report).'
+    required: false
+    default: 'friction-audit-output'
+
+outputs:
+  cls_score:
+    description: 'Final composite Cognitive Load Score (0–100). Lower is better.'
+
+  passed:
+    description: '"true" if CLS is within threshold, "false" if it exceeded the threshold.'
+
+  report_path:
+    description: 'Path to the generated HTML audit report.'
+
+  trace_path:
+    description: 'Path to the JSON trace file containing full step-by-step audit data.'
+
+  friction_points_count:
+    description: 'Total number of friction points detected across all steps.'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  env:
+    INPUT_SCENARIO_PATH: ${{ inputs.scenario_path }}
+    INPUT_TARGET_URL: ${{ inputs.target_url }}
+    INPUT_CLS_THRESHOLD: ${{ inputs.cls_threshold }}
+    INPUT_FAIL_ON_EXCEED: ${{ inputs.fail_on_exceed }}
+    INPUT_PERSONA_PRESET: ${{ inputs.persona_preset }}
+    INPUT_MAX_STEPS: ${{ inputs.max_steps }}
+    INPUT_USE_LLM: ${{ inputs.use_llm }}
+    INPUT_POST_PR_COMMENT: ${{ inputs.post_pr_comment }}
+    INPUT_OUTPUT_DIR: ${{ inputs.output_dir }}
