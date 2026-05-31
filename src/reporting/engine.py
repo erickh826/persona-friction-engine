@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from html import escape
 from pathlib import Path
 from typing import Any
@@ -36,10 +37,12 @@ class ReportingEngine:
     def generate_html_report(self, run_result: dict[str, Any], output_path: str) -> str:
         output = Path(output_path)
         output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(self.render_html(run_result), encoding="utf-8")
+        output.write_text(self.render_html(run_result, report_dir=output.parent), encoding="utf-8")
         return str(output)
 
-    def render_html(self, run_result: dict[str, Any]) -> str:
+    def render_html(
+        self, run_result: dict[str, Any], report_dir: Path | None = None
+    ) -> str:
         steps = self._steps(run_result)
         chart_payload = self._chart_payload(run_result, steps)
         scenario_id = self._text(run_result.get("scenario_id", "unknown-scenario"))
@@ -106,7 +109,7 @@ class ReportingEngine:
     <section class="mt-8 rounded-3xl border border-slate-800 bg-slate-900 p-6">
       <h2 class="text-2xl font-bold text-white">Step Timeline</h2>
       <div class="mt-6 space-y-6">
-        {self._timeline_html(steps)}
+        {self._timeline_html(steps, report_dir)}
       </div>
     </section>
   </main>
@@ -168,18 +171,22 @@ class ReportingEngine:
             for label, value in cards
         ) + "\n      </div>"
 
-    def _timeline_html(self, steps: list[dict[str, Any]]) -> str:
+    def _timeline_html(
+        self, steps: list[dict[str, Any]], report_dir: Path | None
+    ) -> str:
         if not steps:
             return "<p class=\"rounded-2xl border border-slate-800 p-4 text-slate-400\">No steps recorded.</p>"
 
-        return "".join(self._step_card(step) for step in steps)
+        return "".join(self._step_card(step, report_dir) for step in steps)
 
-    def _step_card(self, step: dict[str, Any]) -> str:
+    def _step_card(self, step: dict[str, Any], report_dir: Path | None) -> str:
         step_number = self._text(step.get("step_number", "?"))
         cls = self._number(step.get("composite_cls", 0))
         current_url = self._text(step.get("current_url", ""))
         action = self._text(step.get("action_taken", "unknown"))
-        screenshot = self._text(step.get("screenshot_path", ""))
+        screenshot = self._text(
+            self._screenshot_src(step.get("screenshot_path", ""), report_dir)
+        )
         friction_points = step.get("identified_friction_points", []) or []
         highest = self._highest_severity(friction_points)
         style = _SEVERITY_STYLES[highest]
@@ -352,6 +359,19 @@ class ReportingEngine:
 
     def _json_script(self, payload: dict[str, Any]) -> str:
         return json.dumps(payload, separators=(",", ":")).replace("</", "<\\/")
+
+    def _screenshot_src(self, screenshot_path: Any, report_dir: Path | None) -> str:
+        screenshot = str(screenshot_path or "")
+        if not screenshot or "://" in screenshot or screenshot.startswith("data:"):
+            return screenshot
+        if report_dir is None:
+            return screenshot
+
+        source = Path(screenshot)
+        if source.exists():
+            return os.path.relpath(source.resolve(), report_dir.resolve())
+
+        return screenshot
 
     def _text(self, value: Any) -> str:
         return escape(str(value), quote=True)

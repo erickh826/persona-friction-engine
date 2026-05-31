@@ -105,6 +105,21 @@ def test_report_color_codes_severity_and_renders_coordinate_overlay(tmp_path):
     assert "Overlay: x=15%, y=15%, width=20%, height=10%" in html
 
 
+def test_report_rewrites_local_screenshot_paths_relative_to_report(tmp_path):
+    screenshot_dir = tmp_path / "screenshots"
+    screenshot_dir.mkdir()
+    screenshot_path = screenshot_dir / "step_001.svg"
+    screenshot_path.write_text("<svg></svg>", encoding="utf-8")
+    output_path = tmp_path / "reports" / "report.html"
+    run_result = _sample_run_result()
+    run_result["steps"][0]["screenshot_path"] = str(screenshot_path)
+
+    ReportingEngine().generate_html_report(run_result, str(output_path))
+
+    html = output_path.read_text(encoding="utf-8")
+    assert 'src="../screenshots/step_001.svg"' in html
+
+
 def test_report_handles_empty_steps(tmp_path):
     output_path = tmp_path / "empty_report.html"
     run_result = _sample_run_result()
