@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mock Checkout Page</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        min-height: 1400px;
+      }
+      .spacer {
+        height: 900px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Mock Store</h1>
+    <p>Find a product and complete checkout with minimal friction.</p>
+    <label for="search">Search products</label>
+    <input id="search" aria-label="Search products" />
+    <button id="buy-button" aria-label="Buy now">Buy Now</button>
+    <a href="#details" id="details-link">View details</a>
+    <div class="spacer"></div>
+    <h2 id="details">Product Details</h2>
+    <script>
+      document.getElementById("buy-button").addEventListener("click", () => {
+        window.location.hash = "checkout";
+      });
+    </script>
+  </body>
+</html>
