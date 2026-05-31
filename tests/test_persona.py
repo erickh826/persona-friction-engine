@@ -199,7 +199,7 @@ class TestDecideNextAction:
         engine = PersonaEngine(llm_client=client)
         engine.decide_next_action(PERSONA_BUSY_MOM, self.state, DOM_STATE)
         call_args = client.chat.completions.create.call_args
-        messages = call_args.kwargs.get("messages") or call_args.args[0] if call_args.args else call_args.kwargs["messages"]
+        messages = call_args.kwargs["messages"]
         user_content = next(
             m["content"] for m in messages if m["role"] == "user"
         )
@@ -210,7 +210,7 @@ class TestDecideNextAction:
         engine = PersonaEngine(llm_client=client)
         engine.decide_next_action(PERSONA_BUSY_MOM, self.state, DOM_STATE, screenshot_path=None)
         call_args = client.chat.completions.create.call_args
-        messages = call_args.kwargs.get("messages") or call_args.kwargs["messages"]
+        messages = call_args.kwargs["messages"]
         user_msg = next(m for m in messages if m["role"] == "user")
         assert isinstance(user_msg["content"], str)
 
